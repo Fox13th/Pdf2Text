@@ -42,30 +42,30 @@ def get_angle(img):
     return best_angle * 0.51
 
 
-img = cv2.imread('text-photographed.jpg')
-sas = get_angle(img)
-print(sas)
+def main():
+    img = cv2.imread('text-photographed.jpg')
+    sas = get_angle(img)
+    print(sas)
 
-im = Image.open('text-photographed.jpg')
+    im = Image.open('text-photographed.jpg')
 
-im_rotate = im.rotate(get_angle(img))
-im_rotate.save('tmp.jpg', quality=95)
-im.close()
+    im_rotate = im.rotate(get_angle(img))
+    im_rotate.save('tmp.jpg', quality=95)
+    im.close()
 
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-im_tmp = Image.open('tmp.jpg')
-text = pytesseract.image_to_string(im_tmp, lang='rus')
-im_tmp.close()
+    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+    im_tmp = Image.open('tmp.jpg')
+    text = pytesseract.image_to_string(im_tmp, lang='rus')
+    im_tmp.close()
 
-# print(text)
-spl_text = text.split("\n")
-text_done = spl_text[0]
-for i in range(len(spl_text) - 1):
-    if spl_text[i + 1].isupper() or spl_text[i + 1] == '':
-        text_done += f' {spl_text[i + 1]}\n'
-    else:
-        text_done += f'{spl_text[i + 1]} '
+    # print(text)
+    spl_text = text.split("\n")
+    text_done = spl_text[0]
+    for i in range(len(spl_text) - 1):
+        if spl_text[i + 1].isupper() or spl_text[i + 1] == '':
+            text_done += f' {spl_text[i + 1]}\n'
+        else:
+            text_done += f'{spl_text[i + 1]} '
 
-sentences = text_done.replace('. ', '.\n')
-
-print(sentences)
+    sentences = text_done.replace('. ', '.\n')
+    print(sentences)
