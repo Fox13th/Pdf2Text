@@ -39,26 +39,22 @@ def get_angle(img):
         if num_zeros > best_zero:
             best_zero = num_zeros
             best_angle = my_angle
-    return best_angle * 0.51
+    return best_angle * 0.5
 
 
-def main():
-    img = cv2.imread('text-photographed.jpg')
-    sas = get_angle(img)
-    print(sas)
-
-    im = Image.open('text-photographed.jpg')
-
+def text_straighten(original_img):
+    img = cv2.imread(original_img)
+    im = Image.open(original_img)
     im_rotate = im.rotate(get_angle(img))
     im_rotate.save('tmp.jpg', quality=95)
     im.close()
 
+
+def extract_text_from_image(lang_source):
     pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
     im_tmp = Image.open('tmp.jpg')
-    text = pytesseract.image_to_string(im_tmp, lang='rus')
+    text = pytesseract.image_to_string(im_tmp, lang=lang_source)
     im_tmp.close()
-
-    # print(text)
     spl_text = text.split("\n")
     text_done = spl_text[0]
     for i in range(len(spl_text) - 1):
@@ -69,3 +65,12 @@ def main():
 
     sentences = text_done.replace('. ', '.\n')
     print(sentences)
+
+
+def main():
+    text_straighten('text-photographed.jpg')
+    extract_text_from_image('rus')
+
+
+if __name__ == "__main__":
+    main()
