@@ -1,3 +1,6 @@
+import os
+from typing import Tuple
+import fitz
 from PIL import Image
 import numpy as np
 import cv2
@@ -67,9 +70,29 @@ def extract_text_from_image(lang_source):
     print(sentences)
 
 
+def convert_pdf_pages_to_img(pdf_name, how_many_pages, output_dir):
+    zoom_x = 2
+    zoom_y = 2
+    mat = fitz.Matrix(zoom_x, zoom_y)
+
+    input_pdf = fitz.open(pdf_name)
+    output_img = []
+    for page in input_pdf:
+        if not page.number == how_many_pages:
+            pix = page.get_pixmap(matrix=mat, alpha=False)
+            output_file = f"{output_dir}\{os.path.splitext(os.path.basename(pdf_name))[0]}_page-%i.png" % page.number
+            pix.save(output_file)
+            output_img.append(output_file)
+        else:
+            break
+    input_pdf.close()
+    return output_img
+
+
 def main():
-    text_straighten('text-photographed.jpg')
-    extract_text_from_image('rus')
+    #text_straighten('text-photographed.jpg')
+    #extract_text_from_image('rus')
+    convert_pdf_pages_to_img("Witness for the Prosecution.pdf", -1, r'C:\Users\deanw\PycharmProjects\sdada')
 
 
 if __name__ == "__main__":
