@@ -74,7 +74,6 @@ def extract_text_from_image(lang_source, output_file):
         file_for_write.write(sentences)
 
 
-
 def convert_pdf_pages_to_img(pdf_name, how_many_pages, output_dir):
     zoom_x = 2
     zoom_y = 2
@@ -94,14 +93,17 @@ def convert_pdf_pages_to_img(pdf_name, how_many_pages, output_dir):
     return output_img
 
 
-def main():
-    #text_straighten('text-photographed.jpg')
-    #extract_text_from_image('rus')
+def pdf_scans_2_txt():
     images = convert_pdf_pages_to_img("Witness for the Prosecution.pdf", 3, r'C:\Users\deanw\PycharmProjects\sdada')
     for image in images:
         text_straighten(image)
         extract_text_from_image('eng', image)
         os.remove(image)
+
+
+def main():
+    text_straighten('text-photographed.jpg')
+    extract_text_from_image('rus')
 
 
 if __name__ == "__main__":
