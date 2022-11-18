@@ -1,8 +1,7 @@
-import os
-from typing import Tuple
-import fitz
 from PIL import Image
 import numpy as np
+import os
+import fitz
 import cv2
 import pytesseract
 
@@ -53,11 +52,12 @@ def text_straighten(original_img):
     im.close()
 
 
-def extract_text_from_image(lang_source):
+def extract_text_from_image(lang_source, output_file):
     pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
     im_tmp = Image.open('tmp.jpg')
     text = pytesseract.image_to_string(im_tmp, lang=lang_source)
     im_tmp.close()
+    os.remove('tmp.jpg')
     spl_text = text.split("\n")
     text_done = spl_text[0]
     for i in range(len(spl_text) - 1):
@@ -67,7 +67,12 @@ def extract_text_from_image(lang_source):
             text_done += f'{spl_text[i + 1]} '
 
     sentences = text_done.replace('. ', '.\n')
-    print(sentences)
+
+    output_file = output_file.replace(".png", ".txt")
+
+    with open(output_file, 'w', encoding='utf-8') as file_for_write:
+        file_for_write.write(sentences)
+
 
 
 def convert_pdf_pages_to_img(pdf_name, how_many_pages, output_dir):
@@ -92,7 +97,11 @@ def convert_pdf_pages_to_img(pdf_name, how_many_pages, output_dir):
 def main():
     #text_straighten('text-photographed.jpg')
     #extract_text_from_image('rus')
-    convert_pdf_pages_to_img("Witness for the Prosecution.pdf", -1, r'C:\Users\deanw\PycharmProjects\sdada')
+    images = convert_pdf_pages_to_img("Witness for the Prosecution.pdf", 3, r'C:\Users\deanw\PycharmProjects\sdada')
+    for image in images:
+        text_straighten(image)
+        extract_text_from_image('eng', image)
+        os.remove(image)
 
 
 if __name__ == "__main__":
