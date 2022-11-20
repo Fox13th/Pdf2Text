@@ -1,3 +1,4 @@
+import easyocr
 from PIL import Image
 import numpy as np
 import os
@@ -52,7 +53,7 @@ def text_straighten(original_img):
     im.close()
 
 
-def extract_text_from_image(lang_source, output_file):
+def extract_text_from_image(lang_source, output_file="tmp.jpg"):
     pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
     im_tmp = Image.open('tmp.jpg')
     text = pytesseract.image_to_string(im_tmp, lang=lang_source)
@@ -68,10 +69,28 @@ def extract_text_from_image(lang_source, output_file):
 
     sentences = text_done.replace('. ', '.\n')
 
-    output_file = output_file.replace(".png", ".txt")
+    if not output_file == "tmp.jpg":
+        output_file = output_file.replace(".png", ".txt")
+    else:
+        output_file = output_file.replace(".jpg", ".txt")
 
     with open(output_file, 'w', encoding='utf-8') as file_for_write:
         file_for_write.write(sentences)
+
+
+def recognition_text_easyocr(lang_source, output_file="tmp.jpg"):
+    reader = easyocr.Reader(["ru", "en"])
+    result = reader.readtext('tmp.jpg', detail=0, paragraph=True)
+    if not output_file == "tmp.jpg":
+        output_file = output_file.replace(".png", ".txt")
+    else:
+        output_file = output_file.replace(".jpg", ".txt")
+
+    with open(output_file, "w", encoding='utf-8') as file:
+        for line in result:
+            file.write(f"{line}\n\n")
+
+    return f"Result wrote into {output_file}"
 
 
 def convert_pdf_pages_to_img(pdf_name, how_many_pages, output_dir):
@@ -94,17 +113,19 @@ def convert_pdf_pages_to_img(pdf_name, how_many_pages, output_dir):
 
 
 def pdf_scans_2_txt():
-    images = convert_pdf_pages_to_img("Witness for the Prosecution.pdf", 3, r'C:\Users\deanw\PycharmProjects\sdada')
+    images = convert_pdf_pages_to_img("table.pdf", 4, r'C:\Users\deanw\PycharmProjects\sdada')
     for image in images:
         text_straighten(image)
-        extract_text_from_image('eng', image)
+        extract_text_from_image('rus+eng', image)
+        #recognition_text_easyocr("en", image)
         os.remove(image)
 
 
 def main():
-    text_straighten('text-photographed.jpg')
-    extract_text_from_image('rus')
-
+    #text_straighten('img_text.jpg')
+    #extract_text_from_image('rus')
+    #print(recognition_text_easyocr("en", "text-photographed.jpg"))
+    pdf_scans_2_txt()
 
 if __name__ == "__main__":
     main()
