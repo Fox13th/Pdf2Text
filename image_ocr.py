@@ -1,5 +1,6 @@
 import easyocr
 from PIL import Image
+from win10toast import ToastNotifier
 import numpy as np
 import os
 import fitz
@@ -113,19 +114,21 @@ def convert_pdf_pages_to_img(pdf_name, how_many_pages, output_dir):
 
 
 def pdf_scans_2_txt():
-    images = convert_pdf_pages_to_img("table.pdf", 4, r'C:\Users\deanw\PycharmProjects\sdada')
+    images = convert_pdf_pages_to_img("bus_sheremetyevo.pdf", 1, r'C:\Users\deanw\PycharmProjects\sdada')
     for image in images:
         text_straighten(image)
         extract_text_from_image('rus+eng', image)
         #recognition_text_easyocr("en", image)
         os.remove(image)
-
+    return len(images)
 
 def main():
     #text_straighten('img_text.jpg')
     #extract_text_from_image('rus')
     #print(recognition_text_easyocr("en", "text-photographed.jpg"))
-    pdf_scans_2_txt()
+    count_docs = pdf_scans_2_txt()
+    toaster = ToastNotifier()
+    toaster.show_toast("Распознавание завершено!", f"Распознано документов: {count_docs}", icon_path="images/icon.ico", duration = 10)
 
 if __name__ == "__main__":
     main()
